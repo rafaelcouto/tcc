@@ -1,0 +1,115 @@
+#nova_mensagem {
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+#latencia, #memoria {
+	color: #999;
+	font-size: 10px;
+	float: right;
+	margin-left: 10px;
+}
+
+/* Messages */
+
+#mensagem {
+	width: 70%;
+	float: left;
+	border-right: 1px dashed #CCC;
+	padding-right: 20px;
+}
+
+#mensagem ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#mensagem li {
+	min-height: 30px;
+	padding-bottom: 8px;
+	margin-bottom: 8px;
+	border-bottom: 1px dashed #CCC;
+}
+
+#mensagem span.usuario_nome {
+	font-weight: bold;
+}
+
+#mensagem img.usuario_imagem {
+	float: left;
+	margin-right: 5px;
+	width: 30px;
+	height: 30px;
+}
+
+#mensagem span.usuario_login {
+	color: #666;
+}
+
+#mensagem span.mensagem_texto span.usuario_nome {
+	font-weight: normal;
+}
+#mensagem span.mensagem_data {
+	color: #999;
+	float: right;
+}
+
+#mensagem span.mensagem_sistema {
+	color: darkblue;
+	font-weight: bold;
+}
+
+/* Users */
+
+#usuario {
+	width: 26%;	
+	float: right;
+}
+
+#usuario ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#usuario li {
+	min-height: 50px;
+	margin-bottom: 2px;
+}
+
+#usuario img.usuario_imagem {
+	float: left;
+	margin-right: 5px;
+}
+
+#usuario span.usuario_nome {
+	font-weight: bold;
+}
+
+#usuario span.usuario_login {
+	color: #666;
+}
+
+/* Channel */
+
+h2 {
+	font-size: 28px;
+	font-weight: bold;
+	color: lightslategray;
+	margin-top: 0;
+	margin-bottom: 10px;
+}
+
+#canal h2 {
+	margin-left: 150px;
+}
+
+#canal #topico {
+	margin-left: 150px;
+}
+
+#canal #imagem img {
+	float: left;
+	border-radius: 10px;
+}

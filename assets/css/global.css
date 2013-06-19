@@ -1,0 +1,31 @@
+
+body {
+	font-family: "Segoe UI";
+	font-size: 12px;
+	background-color: lightslategray;
+}
+
+#general {
+	margin: 0 auto;
+	width: 900px;
+	background-color: #FFF;
+	padding: 15px;
+	border-radius: 15px;
+}
+
+a:link, a:visited, a:active {
+	color: maroon;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+	color: maroon;
+}
+
+input[type=text], input[type=password], textarea {
+	font-size: 12px;
+	font-family: "Segoe UI";
+	padding: 3px;
+	border: 1px solid #999;
+}

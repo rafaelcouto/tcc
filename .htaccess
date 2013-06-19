@@ -1,0 +1,5 @@
+RewriteEngine on
+RewriteCond %{SCRIPT_FILENAME} !-f
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteCond $1 !^(index\.php|images|robots\.txt|css|js)
+RewriteRule ^(.*)$ /tcc/index.php/$1 [L]
