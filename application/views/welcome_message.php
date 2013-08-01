@@ -63,6 +63,21 @@
 		-webkit-box-shadow: 0 0 8px #D0D0D0;
 	}
 	</style>
+	
+	<script type="text/javascript">
+		
+		var conn = new WebSocket('ws://localhost:9000');
+		
+		conn.onopen = function(e) {
+		    console.log("Connection established!");
+		};
+		
+		conn.onmessage = function(e) {
+		    console.log(e.data);
+		};
+
+	</script>
+	
 </head>
 <body>
 

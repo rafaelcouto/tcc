@@ -33,7 +33,7 @@
  * @var string
  *
  */
-	define('CI_VERSION', '2.1.3');
+	define('CI_VERSION', '2.1.4');
 
 /**
  * CodeIgniter Branch (Core = TRUE, Reactor = FALSE)
@@ -232,7 +232,6 @@
 	{
 		return CI_Controller::get_instance();
 	}
-
 
 	if (file_exists(APPPATH.'core/'.$CFG->config['subclass_prefix'].'Controller.php'))
 	{

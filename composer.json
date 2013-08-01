@@ -1,0 +1,11 @@
+{
+    "config":
+    {
+        "vendor-dir": "application/libraries"
+    },
+    
+    "require": 
+    {
+        "cboden/Ratchet": "0.2.*"
+    }
+}

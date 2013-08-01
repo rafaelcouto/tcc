@@ -12,6 +12,14 @@ class Online_Model extends CI_Model {
 						->get($this->colecao);
 	}
 	
+	public function get_recurso_by_canal($nome)
+	{
+		return $this->mongo_db
+						->select(array('recurso'))
+						->where(array('canal.nome' => $nome))
+						->get($this->colecao);
+	}
+	
 	public function entrar($canal)
 	{
 		$this->load->model(array('Usuario_Model', 'Mensagem_Model'));
@@ -21,24 +29,28 @@ class Online_Model extends CI_Model {
 		$this->Mensagem_Model->salvar($canal, $usuario, $this->login->get('login') . ' entrou no canal');
 	}
 	
-    public function atualizar($canal)
+    public function atualizar($canal, $usuario, $recurso = null)
     {
     	// Definindo informações
 		$item['canal'] = array('nome' => $canal['nome']);
 		
 		$item['usuario'] = array(
-								'login' => $this->login->get('login'),
-								'nome' => $this->login->get('nome'),
-								'imagem' => $this->login->get('imagem')
+								'login' => $usuario['login'],
+								'nome' => $usuario['nome'],
+								'imagem' => $usuario['imagem']
 							  );
 							  
 		$item['tempo'] = time();
+		
+		// Se houver recurso (websocket)
+		if (!empty($recurso))
+			$item['recurso'] = $recurso;
 		
 		// Selecionando status
 		$itens = $this->mongo_db
 					  	->where(array(
 					  		'canal.nome' => $canal['nome'],
-					  		'usuario.login' => $this->login->get('login')
+					  		'usuario.login' => $usuario['login']
 						))
 					  	->get($this->colecao);
 		
@@ -69,6 +81,12 @@ class Online_Model extends CI_Model {
 						->set($item)
 						->update($this->colecao);
     }
+
+	public function get_by_recurso($recurso = null)
+	{
+		$item = $this->mongo_db->where(array('recurso' => $recurso))->get('online');
+		return (empty($item)) ? null : $item[0];
+	}
 
 }
 

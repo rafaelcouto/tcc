@@ -15,10 +15,11 @@ class Canal extends CI_Controller {
         if (!$this->login->verificar('usuario'))
 			exit;
 		
-		$tecnologia = $this->session->userdata('tecnologia');
+		$data['tecnologia'] = $this->session->userdata('tecnologia');
 		
 		// Selecionando canal
 		$data['canal'] = $this->Canal_Model->get_by_nome($canal);
+		$data['usuario'] = $this->login->getUser();
 		
 		// Se não existir
 		if (empty($data['canal']))
@@ -26,7 +27,7 @@ class Canal extends CI_Controller {
 		
 		// Assets
 		$this->css = array('canal.css');
-		$this->js = array('canal.js', "{$tecnologia}.js", 'lib/sprintf.js', 'lib/jquery.dateFormat.js');
+		$this->js = array('canal.js', "{$data["tecnologia"]}.js", 'lib/sprintf.js', 'lib/jquery.dateFormat.js');
 		
 		// View
 		$this->layout->view("canal/index", $data);

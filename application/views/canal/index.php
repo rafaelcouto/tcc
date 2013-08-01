@@ -1,5 +1,8 @@
 <script type="text/javascript">
 	var canal_nome = '<?php echo $canal['nome'] ?>';
+	var usuario_login = '<?php echo $usuario['login'] ?>';
+	var usuario_senha = '<?php echo $usuario['senha'] ?>'; 
+	var tecnologia = '<?php echo $tecnologia ?>';
 </script>
 
 <div id="canal">

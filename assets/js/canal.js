@@ -4,20 +4,23 @@ var usuario_formato = "<img class='usuario_imagem' src='" + assets_url + "/img/u
 
 // Quando carregada a página
 $(function($) {
-
-	// Enviar mensagem
-    $('#nova_mensagem').bind('keypress', function(e) {
-       
-       	// Se pressionado ENTER
-        if (e.keyCode == 13)
-        {
-        	// Salvando mensagem
-            $.post(base_url + 'mensagem/salvar/' + canal_nome, {mensagem: $('#nova_mensagem').val()}, function(data) {
-                // Limpando
-                $('#nova_mensagem').val('');
-            }, 'json');
-        }
-        
-    });
+	
+	if (tecnologia != 'ws')
+	{
+		// Enviar mensagem
+	    $('#nova_mensagem').bind('keypress', function(e) {
+	       
+	       	// Se pressionado ENTER
+	        if (e.keyCode == 13)
+	        {
+	        	// Salvando mensagem
+	            $.post(base_url + 'mensagem/salvar/' + canal_nome, {mensagem: $('#nova_mensagem').val()}, function(data) {
+	                // Limpando
+	                $('#nova_mensagem').val('');
+	            }, 'json');
+	        }
+	        
+	    });
+	}
 	
 });
