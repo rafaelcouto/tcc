@@ -12,31 +12,39 @@ $(function($) {
 	
 	ws.onmessage = function(e) {
 		
-		// Alocando retorno
+		// Decodificando retorno
 		var dados = JSON.parse(e.data);
 		
-		
-	    
-		// Definindo ação
-		switch (dados.acao)
+		// Se houver ação
+		if (dados.acao != null)
 		{
-			// Nova mensagem
-		    case "mensagem":
-		    
-		    	$('#mensagem ul').prepend($('<li>' + sprintf(mensagem_formato, dados.usuario.imagem, dados.usuario.nome, dados.usuario.login, $.format.date(dados.data.sec*1000, 'dd/MM/yyyy HH:mm:ss'), dados.texto) + '</li>').fadeIn('slow'));
-				break;
+			// Definindo ação
+			switch (dados.acao)
+			{
+				// Nova mensagem
+			    case "mensagem":
+			    
+			    	$('#mensagem ul').prepend($('<li>' + sprintf(mensagem_formato, dados.usuario.imagem, dados.usuario.nome, dados.usuario.login, $.format.date(dados.data.sec*1000, 'dd/MM/yyyy HH:mm:ss'), dados.texto) + '</li>').fadeIn('slow'));
+					break;
+					
+				// Mudança usuário
+				case "usuario":
 				
-			// Mudança usuário
-			case "usuario":
-			
-				// Usuários
-	    		$('#usuario ul').empty();
-	    
-				$.each(dados.usuario, function() {
-		            $('#usuario ul').append($('<li>' + sprintf(usuario_formato, this.usuario.imagem, this.usuario.nome, this.usuario.login, this.usuario.login) + '</li>'));
-		        });
-		        
-		        break;
+					// Usuários
+		    		$('#usuario ul').empty();
+		    
+					$.each(dados.usuario, function() {
+			            $('#usuario ul').append($('<li>' + sprintf(usuario_formato, this.usuario.imagem, this.usuario.nome, this.usuario.login, this.usuario.login) + '</li>'));
+			        });
+			        
+			        break;
+			        
+			    // Erro
+			    case "erro":
+			    
+			    	$('#mensagem ul').prepend($('<li>' + dados.texto + '</li>').fadeIn('slow'));
+			    	break;
+			}
 		}
 
 	};

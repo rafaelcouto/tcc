@@ -20,15 +20,6 @@ class Online_Model extends CI_Model {
 						->get($this->colecao);
 	}
 	
-	public function entrar($canal)
-	{
-		$this->load->model(array('Usuario_Model', 'Mensagem_Model'));
-		
-		$usuario = $this->Usuario_Model->get_by_login('servico_canal');
-		
-		$this->Mensagem_Model->salvar($canal, $usuario, $this->login->get('login') . ' entrou no canal');
-	}
-	
     public function atualizar($canal, $usuario, $recurso = null)
     {
     	// Definindo informações
@@ -63,13 +54,11 @@ class Online_Model extends CI_Model {
 			// Se inserido com sucesso
 			if (!empty($id))
 			{
-				// Registrando mensagem de canal
-				$this->entrar($canal);
-				
 				// Retornando ID do documento
 				return $id;	
 			}
-			else {
+			else 
+			{
 				return null;
 			}
 
@@ -84,8 +73,13 @@ class Online_Model extends CI_Model {
 
 	public function get_by_recurso($recurso = null)
 	{
-		$item = $this->mongo_db->where(array('recurso' => $recurso))->get('online');
+		$item = $this->mongo_db->where(array('recurso' => $recurso))->get($this->colecao);
 		return (empty($item)) ? null : $item[0];
+	}
+	
+	public function delete_by_id($id = null)
+	{
+		return $this->mongo_db->where(array('_id' => $id))->delete($this->colecao);
 	}
 
 }
