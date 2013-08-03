@@ -2,10 +2,25 @@
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
-class Websocket implements MessageComponentInterface  {
+class Websocket implements MessageComponentInterface  
+{
 	
+	/**
+     * Instancia do codeigniter
+	 * @var Object
+     */
 	private $ci;
-	protected $usuarios;
+	
+	/**
+     * Clientes conectados ao servidor
+	 * @var \SplObjectStorage
+     */
+	protected $clientes;
+	
+	/**
+     * Parâmetros recebidos do cliente
+	 * @var Object
+     */
 	private $dados;
 	
 	/**
@@ -17,10 +32,14 @@ class Websocket implements MessageComponentInterface  {
     public function __construct() 
     {
     	$this->ci =& get_instance();
-        $this->usuarios = new \SplObjectStorage;
+        $this->clientes = new \SplObjectStorage;
 		
 		// Carregando modelos
 		$this->ci->load->model(array('Usuario_Model', 'Online_Model', 'Canal_Model'));
+		
+		// Biblioteca de mensagens
+		$this->ci->load->library('Mensagem');
+		$this->ci->mensagem->iniciar($this->ci, $this->clientes);
     }
 	
 	/**
@@ -31,8 +50,13 @@ class Websocket implements MessageComponentInterface  {
 	 
     public function onOpen(ConnectionInterface $conn) 
     {
+    	$this->ci->load->library('Cliente');
+		
+    	$cliente = new Cliente();
+		$cliente->recurso = $conn;
+		
     	// Adicionando recurso
-        $this->usuarios->attach($conn);
+        $this->clientes->attach($cliente);
     }
 	
 	/**
@@ -43,18 +67,27 @@ class Websocket implements MessageComponentInterface  {
 	 
 	public function onClose(ConnectionInterface $conn) 
 	{
-		// Removendo recurso
-        $this->usuarios->detach($conn);
-        
-		// Selecionando usuário
-		$online = $this->ci->Online_Model->get_by_recurso($conn->resourceId);
-		
-		// Removendo usuário
-		$this->ci->Online_Model->delete_by_id($online['_id']);
+		// Passandos pelos clientes
+		foreach ($this->clientes as $cliente)
+		{
+			// Se encontrado
+			if ($cliente->recurso->resourceId === $conn->resourceId)
+			{
+				// Removendo cliente
+				$this->clientes->detach($cliente);
+				break;
+			}
+		}
+
+		// Enviando mensagem de saída
+		$mensagem = $this->ci->mensagem->construir($this->ci->Usuario_Model->usuario_canal, sprintf('@%s saiu no canal', $cliente->usuario['login']));
+		$this->ci->mensagem->broadcast($cliente->canal['nome'], $mensagem);
 		
 		// Atualizando usuários
-		$this->usuarios_online($online['canal']['nome']);
+		$this->usuarios_online($cliente->canal['nome']);
 		
+		// Log
+		echo sprintf('@%s saiu do canal #%s', $cliente->usuario['login'], $cliente->canal['nome']) . PHP_EOL;
     }
 	
 	/**
@@ -63,7 +96,8 @@ class Websocket implements MessageComponentInterface  {
 	 * @return void
 	 */
 	 
-    public function onError(ConnectionInterface $conn, \Exception $e) {
+    public function onError(ConnectionInterface $conn, \Exception $e) 
+    {
         echo "An error has occurred: {$e->getMessage()}\n";
         $conn->close();
     }
@@ -74,7 +108,7 @@ class Websocket implements MessageComponentInterface  {
 	 * @return void
 	 */
 	
-    public function onMessage(ConnectionInterface $from, $msg) 
+    public function onMessage(ConnectionInterface $conn, $msg) 
     {
     	$retorno = null;
 		
@@ -93,11 +127,11 @@ class Websocket implements MessageComponentInterface  {
 			{
 				// Entrar em um canal
 			    case 'entrar':
-					$retorno = $this->entrar($from);
+					$retorno = $this->entrar($conn);
 					break;
 				// Enviar uma mensagem
-				case 'mensagem':
-					$retorno = $this->mensagem($from);
+				case 'enviar_mensagem':
+					$retorno = $this->enviar_mensagem($conn);
 					break;
 				default:
 					$retorno = 'Nenhuma ação encontrada';
@@ -106,55 +140,70 @@ class Websocket implements MessageComponentInterface  {
 		
 		// Enviando retorno
 		if (!empty($retorno))
-			$from->send(json_encode(array('acao' => 'erro', 'texto' => $retorno)));
+			$conn->send($this->ci->mensagem->construir($this->ci->Usuario_Model->usuario_sistema, $retorno));
+			
     }
 	
 	/**
 	 * Envia mensagem de um cliente para os outros conectados ao canal
 	 *
 	 * @param ConnectionInterface $ws
-	 * @return void
+	 * @return mixed
 	 */
 	 
-	private function mensagem($ws)
+	private function enviar_mensagem($conn)
 	{
+		$this->dados->texto = htmlspecialchars($this->dados->texto);
+		
 		// Validações
 		// Texto
 		if (empty($this->dados->texto))
 			return 'Nenhuma mensagem definida';
 		
+		if (strlen($this->dados->texto) > 140)
+			return 'A mensagem deve ter no máximo 250 caracteres';
+		
 		// Canal
 		if (empty($this->dados->canal))
 			return 'Nenhum canal definido';
-
-		// Selecionando usuário
-		$online = $this->ci->Online_Model->get_by_recurso($ws->resourceId);
+		
+		// Selecionando cliente
+		$cliente = $this->get_cliente($conn);
 		
 		// Se não existir
-		if (empty($online))
-			return 'Usuário não encontrado no canal';
+		if (empty($cliente))
+			return 'Cliente não encontrado';
 		
-		// Construindo mensagem
-		$mensagem = json_encode(array(
-									'acao' => 'mensagem', 
-								  	'texto' => $this->dados->texto, 
-								  	'usuario' => $online['usuario'],
-								  	'data' => new MongoDate(time())
-								 	)
-								);
+		// Se comando
+        if (substr($this->dados->texto, 0, 1) == '/')
+        {
+            $this->ci->load->library('bash', array('clientes' => $this->clientes));
+			$this->ci->bash->iniciar($this->ci, $this->clientes);
+			$retorno = $this->ci->bash->interpretar($cliente, $this->dados->texto);
+			
+			// Se houver retorno
+			if (!empty($retorno))
+            	$conn->send($this->ci->mensagem->construir($this->ci->Usuario_Model->usuario_sistema, $retorno));
+
+			// Finalizando
+           	return;
+        } 
 		
-		// Enviando			 
-		$this->broadcast($online['canal']['nome'], $mensagem);
+		// Enviando mensagem	 
+		$this->ci->mensagem->broadcast($cliente->canal['nome'], $this->ci->mensagem->construir($cliente->usuario, $this->dados->texto));
+		
+		// Log
+		echo sprintf('@%s enviou uma mensagem para o canal #%s', $cliente->usuario['login'], $cliente->canal['nome']) . PHP_EOL;
 	}
 	
 	/**
 	 * Registra que o usuário está no canal
 	 *
 	 * @param ConnectionInterface $ws
-	 * @return void
+	 * @return mixed
 	 */
 	 
-    private function entrar($ws)
+    private function entrar($conn)
 	{
 		// Validações
 		// Usuário
@@ -183,12 +232,30 @@ class Websocket implements MessageComponentInterface  {
 		if (empty($canal))
 			return 'Canal não encontrado';
 		
-		// Definindo status
-		$this->ci->Online_Model->atualizar($canal, $usuario, $ws->resourceId);
-
-		// Atualizando usuários
-		$this->usuarios_online($canal['nome']);
+		// Passandos pelos clientes
+		foreach ($this->clientes as $cliente)
+		{
+			// Se encontrado
+			if ($cliente->recurso->resourceId === $conn->resourceId)
+			{
+				// Definindo usuário e canal
+				$cliente->usuario = $usuario;
+				$cliente->canal = $canal;
+				
+				// Finalizando busca
+				break;
+			}			
+		}
 		
+		// Enviando
+		$mensagem = $this->ci->mensagem->construir($this->ci->Usuario_Model->usuario_canal, sprintf('@%s entrou no canal', $cliente->usuario['login']));
+		$this->ci->mensagem->broadcast($cliente->canal['nome'], $mensagem);
+		
+		// Atualizando usuários
+		$this->usuarios_online($cliente->canal['nome']);
+		
+		// Log
+		echo sprintf('@%s entrou no canal #%s', $cliente->usuario['login'], $cliente->canal['nome']) . PHP_EOL;
 	}
 	
 	/**
@@ -200,39 +267,39 @@ class Websocket implements MessageComponentInterface  {
 	 
 	private function usuarios_online($canal)
 	{
-		// Selecionando usuários
-		$onlines = $this->ci->Online_Model->get_by_canal($canal);
-		
-		// Atualizando usuários
-		$mensagem = json_encode(array('acao' => 'usuario', 'usuario' => $onlines));
-		$this->broadcast($canal, $mensagem);
-	}
-	
-	/**
-	 * Envia uma mensagem para todos os clientes conectados no canal determinado
-	 *
-	 * @param string $canal nome do canal
-	 * @param string $mensagem
-	 * @return void
-	 */
-	 
-	private function broadcast($canal, $mensagem)
-	{
-		$recursos = array();
-		
-		// Selecionando somente recursos do canal
-		$onlines = $this->ci->Online_Model->get_recurso_by_canal($canal);
-		
-		// Alocando recursos
-		foreach ($onlines as $online)
-			$recursos[] = $online['recurso'];
+		$usuarios = array();
 		
 		// Passandos pelos clientes
-		foreach ($this->usuarios as $usuario)
+		foreach ($this->clientes as $cliente)
 			// Se estiver no canal
-			if (in_array($usuario->resourceId, $recursos))
+			if ($cliente->canal['nome'] === $canal)
 				// Enviando mensagem
-				$usuario->send($mensagem);
+				$usuarios[] = $cliente->usuario;
+
+		// Atualizando usuários
+		$mensagem = json_encode(array('acao' => 'usuario', 'usuarios' => $usuarios));
+		$this->ci->mensagem->broadcast($canal, $mensagem);
+	}
+	
+	
+	
+	/**
+	 * Selecionando cliente através da conexão
+	 *
+	 * @param ConnectionInterface $conn
+	 * @return Cliente
+	 */
+	 
+	private function get_cliente($conn)
+	{
+		// Passandos pelos clientes
+		foreach ($this->clientes as $cliente)
+			// Se encontrado
+			if ($cliente->recurso->resourceId === $conn->resourceId)
+				// Retornando
+				return $cliente;
+		
+		return null;
 	}
 
 }

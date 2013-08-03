@@ -55,7 +55,7 @@ class Canal extends CI_Controller {
 		$this->load->model(array('Online_Model', 'Mensagem_Model'));
 		
 		// Atualizando status
-		$this->Online_Model->atualizar($canal);
+		$this->Online_Model->atualizar($canal, $this->login->getUser());
 		
 		$data = array();
 		$data['mensagem'] = $this->Mensagem_Model->get_by_canal($canal['nome'], $this->input->post('maior_que'));
@@ -104,7 +104,7 @@ class Canal extends CI_Controller {
         	$this->timer->start();
 
 			// Atualizando status
-			$this->Online_Model->atualizar($canal);
+			$this->Online_Model->atualizar($canal, $this->login->getUser());
 			
 			// Buscando mensagens e usuários
 			$data['mensagem'] = $this->Mensagem_Model->get_by_canal($canal['nome'], $this->input->post('maior_que'));
@@ -177,7 +177,7 @@ class Canal extends CI_Controller {
         	$this->timer->start();
 
 			// Atualizando status
-			$this->Online_Model->atualizar($canal);
+			$this->Online_Model->atualizar($canal, $this->login->getUser());
 			
 			// Buscando mensagens e usuários
 			$data['usuario'] = $this->Online_Model->get_by_canal($canal['nome']);

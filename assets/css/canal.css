@@ -50,14 +50,19 @@
 #mensagem span.mensagem_texto span.usuario_nome {
 	font-weight: normal;
 }
+
+#mensagem li.servico_canal span.mensagem_texto {
+	color: darkblue;
+}
+
+#mensagem li.sistema span.mensagem_texto {
+	color: maroon;
+	font-weight: bold;
+}
+
 #mensagem span.mensagem_data {
 	color: #999;
 	float: right;
-}
-
-#mensagem span.mensagem_sistema {
-	color: darkblue;
-	font-weight: bold;
 }
 
 /* Users */
@@ -74,22 +79,21 @@
 }
 
 #usuario li {
-	min-height: 50px;
+	min-height: 35px;
 	margin-bottom: 2px;
 }
 
 #usuario img.usuario_imagem {
 	float: left;
 	margin-right: 5px;
+	width: 30px;
+	height: 30px;
 }
 
 #usuario span.usuario_nome {
 	font-weight: bold;
 }
 
-#usuario span.usuario_login {
-	color: #666;
-}
 
 /* Channel */
 

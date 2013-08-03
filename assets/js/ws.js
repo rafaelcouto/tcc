@@ -6,7 +6,7 @@ $(function($) {
 
 	ws.onopen = function(e) {
 	    
-	    // Entrando no cancal
+	    // Entrando no cannal
 	    ws.send(JSON.stringify({acao: 'entrar', login: usuario_login, senha: usuario_senha, canal: canal_nome}));
 	};
 	
@@ -24,7 +24,7 @@ $(function($) {
 				// Nova mensagem
 			    case "mensagem":
 			    
-			    	$('#mensagem ul').prepend($('<li>' + sprintf(mensagem_formato, dados.usuario.imagem, dados.usuario.nome, dados.usuario.login, $.format.date(dados.data.sec*1000, 'dd/MM/yyyy HH:mm:ss'), dados.texto) + '</li>').fadeIn('slow'));
+			    	$('#mensagem ul').prepend($('<li class="' + dados.estilo + '">' + sprintf(mensagem_formato, dados.usuario.imagem, dados.usuario.nome, dados.usuario.login, $.format.date(dados.data.sec*1000, 'dd/MM/yyyy HH:mm:ss'), dados.texto) + '</li>').fadeIn('slow'));
 					break;
 					
 				// Mudança usuário
@@ -33,17 +33,11 @@ $(function($) {
 					// Usuários
 		    		$('#usuario ul').empty();
 		    
-					$.each(dados.usuario, function() {
-			            $('#usuario ul').append($('<li>' + sprintf(usuario_formato, this.usuario.imagem, this.usuario.nome, this.usuario.login, this.usuario.login) + '</li>'));
+					$.each(dados.usuarios, function() {
+			            $('#usuario ul').append($('<li>' + sprintf(usuario_formato, this.imagem, this.nome, this.login, this.login) + '</li>'));
 			        });
 			        
 			        break;
-			        
-			    // Erro
-			    case "erro":
-			    
-			    	$('#mensagem ul').prepend($('<li>' + dados.texto + '</li>').fadeIn('slow'));
-			    	break;
 			}
 		}
 
@@ -56,7 +50,7 @@ $(function($) {
         if (e.keyCode == 13)
         {
         	// Salvando mensagem
-            ws.send(JSON.stringify({acao: 'mensagem', texto: $('#nova_mensagem').val(), canal: canal_nome}));
+            ws.send(JSON.stringify({acao: 'enviar_mensagem', texto: $('#nova_mensagem').val(), canal: canal_nome}));
             
             // Limpando
             $('#nova_mensagem').val('');

@@ -1,6 +1,6 @@
 // Formatos padrões
 var mensagem_formato = "<img class='usuario_imagem' src='" + assets_url + "/img/usuario/%s'></img> <span class='usuario_nome'>%s</span> <span class='usuario_login'>(@%s)</span> <span class='mensagem_data'>%s</span> <br /> <span class='mensagem_texto'>%s</span>"; 
-var usuario_formato = "<img class='usuario_imagem' src='" + assets_url + "/img/usuario/%s' /> <span class='usuario_nome'>%s</span> <br /> <a href='" + base_url + "usuario/perfil/%s'>@<span class='usuario_login'>%s</span></a>";
+var usuario_formato = "<img class='usuario_imagem' src='" + assets_url + "/img/usuario/%s' /> <span class='usuario_nome'>%s</span> <br /> <a href='" + base_url + "usuario/perfil/%s' target='_blank'>@<span class='usuario_login'>%s</span></a>";
 
 // Quando carregada a página
 $(function($) {
