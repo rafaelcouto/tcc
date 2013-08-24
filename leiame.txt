@@ -1,0 +1,2 @@
+D:\Web\mongodb\mongod.exe --dbpath D:\Web\mongodb\data
+php D:\Web\tcc\index.php servidor listen
