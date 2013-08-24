@@ -2,6 +2,12 @@
 
 class Usuario extends CI_Controller {
 
+	/**
+	 * Página principal do usuário, caso não esteja logado, 
+	 * carrega página para logar
+	 *
+	 * @return void
+	 */
 	public function index()
     {
         if (!$this->login->verificar())
@@ -15,6 +21,11 @@ class Usuario extends CI_Controller {
         }
     }
     
+	/**
+	 * Loga o usuário no sistema
+	 *
+	 * @return void
+	 */
     public function entrar()
     { 
         if ($this->login->logar($this->input->post('usuario', true), md5($this->input->post('senha', true))))
@@ -29,6 +40,11 @@ class Usuario extends CI_Controller {
             echo 'Usuário ou senha inválido';
     }
     
+	/**
+	 * Desloga o usuário do sistema
+	 *
+	 * @return void
+	 */
     public function sair()
     {
         $this->login->logout('usuario');

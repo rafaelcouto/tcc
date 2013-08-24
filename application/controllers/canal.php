@@ -10,15 +10,21 @@ class Canal extends CI_Controller {
         $this->load->model('Canal_Model');      
     }
 	
-	public function index($canal = null)
+	/**
+	 * Página principal do canal
+	 *
+	 * @param string $canal - nome do canal
+	 * @return void
+	 */
+	public function index($canal)
     {
-        if (!$this->login->verificar('usuario'))
-			exit;
+        if (!$this->login->verificar()) exit;
 		
+		// Definindo tecnologia utilizada
 		$data['tecnologia'] = $this->session->userdata('tecnologia');
 		
 		// Selecionando canal
-		$data['canal'] = $this->Canal_Model->get_by_nome($canal);
+		$data['canal'] = $this->Canal_Model->buscar_por_nome($canal);
 		$data['usuario'] = $this->login->getUser();
 		
 		// Se não existir
@@ -34,10 +40,15 @@ class Canal extends CI_Controller {
 		
     }
 	
+	/**
+	 * Atualiza o canal através de 'Short Polling (SP)' 
+	 *
+	 * @param string $canal - nome do canal
+	 * @return void
+	 */
 	public function sp_atualizar($canal)
 	{
-		if (!$this->login->verificar())
-			exit;
+		if (!$this->login->verificar()) exit;
 		
 		// Iniciando timer
 		$this->load->library('timer');
@@ -45,7 +56,7 @@ class Canal extends CI_Controller {
         $this->timer->start();	
 		
 		// Selecionando canal
-		$canal = $this->Canal_Model->get_by_nome($canal);
+		$canal = $this->Canal_Model->buscar_por_nome($canal);
 		
 		// Se não existir
 		if (empty($canal))
@@ -58,8 +69,8 @@ class Canal extends CI_Controller {
 		$this->Online_Model->atualizar($canal, $this->login->getUser());
 		
 		$data = array();
-		$data['mensagem'] = $this->Mensagem_Model->get_by_canal($canal['nome'], $this->input->post('maior_que'));
-		$data['usuario'] = $this->Online_Model->get_by_canal($canal['nome']);
+		$data['mensagem'] = $this->Mensagem_Model->buscar_por_canal($canal['nome'], $this->input->post('maior_que'));
+		$data['usuario'] = $this->Online_Model->buscar_por_canal($canal['nome']);
 
 		// Finalizando timer
         $this->timer->stop();
@@ -73,6 +84,12 @@ class Canal extends CI_Controller {
 		
 	}
 	
+	/**
+	 * Atualiza o canal através de 'Long Polling (LP)'
+	 *
+	 * @param string $canal - nome do canal
+	 * @return void
+	 */
 	public function lp_atualizar($canal)
 	{
 		if (!$this->login->verificar()) exit;
@@ -81,7 +98,7 @@ class Canal extends CI_Controller {
 		set_time_limit(0);
 		
 		// Selecionando canal
-		$canal = $this->Canal_Model->get_by_nome($canal);
+		$canal = $this->Canal_Model->buscar_por_nome($canal);
 		
 		// Se não existir
 		if (empty($canal)) exit;
@@ -107,8 +124,8 @@ class Canal extends CI_Controller {
 			$this->Online_Model->atualizar($canal, $this->login->getUser());
 			
 			// Buscando mensagens e usuários
-			$data['mensagem'] = $this->Mensagem_Model->get_by_canal($canal['nome'], $this->input->post('maior_que'));
-			$data['usuario'] = $this->Online_Model->get_by_canal($canal['nome']);
+			$data['mensagem'] = $this->Mensagem_Model->buscar_por_canal($canal['nome'], $this->input->post('maior_que'));
+			$data['usuario'] = $this->Online_Model->buscar_por_canal($canal['nome']);
 			
 			// Alocando usuários online para comparação
 			foreach ($data['usuario'] as $usuario)
@@ -142,6 +159,12 @@ class Canal extends CI_Controller {
 
 	}
 	
+	/**
+	 * Atualiza o canal através de 'Server-sent Event (SSE)'
+	 *
+	 * @param string $canal - nome do canal
+	 * @return void
+	 */
 	public function sse_atualizar($canal)
 	{
 		if (!$this->login->verificar()) exit;
@@ -154,7 +177,7 @@ class Canal extends CI_Controller {
 		set_time_limit(0);
 		
 		// Selecionando canal
-		$canal = $this->Canal_Model->get_by_nome($canal);
+		$canal = $this->Canal_Model->buscar_por_nome($canal);
 		
 		// Se não existir
 		if (empty($canal)) exit;
@@ -180,8 +203,8 @@ class Canal extends CI_Controller {
 			$this->Online_Model->atualizar($canal, $this->login->getUser());
 			
 			// Buscando mensagens e usuários
-			$data['usuario'] = $this->Online_Model->get_by_canal($canal['nome']);
-			$data['mensagem'] = $this->Mensagem_Model->get_by_canal($canal['nome'], $ultima_mensagem_id->{'$id'});
+			$data['usuario'] = $this->Online_Model->buscar_por_canal($canal['nome']);
+			$data['mensagem'] = $this->Mensagem_Model->buscar_por_canal($canal['nome'], $ultima_mensagem_id->{'$id'});
 			$c = count($data['mensagem']);
 			
 			if ($c > 0)

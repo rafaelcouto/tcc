@@ -4,7 +4,24 @@ class Online_Model extends CI_Model {
     
 	private $colecao = 'online';
 	
-	public function get_by_canal($nome)
+	/**
+	 * Busca os usuários online com o tempo menor que o informado
+	 *
+	 * @param int $tempo
+	 * @return array
+	 */
+	public function buscar_por_tempo($tempo)
+	{
+		return $this->mongo_db->where_lt('tempo', $tempo)->get($this->colecao);
+	}
+	
+	/**
+	 * Busca os usuários online de um canal
+	 *
+	 * @param string $nome
+	 * @return array
+	 */
+	public function buscar_por_canal($nome)
 	{
 		return $this->mongo_db
 						->select(array('usuario.nome', 'usuario.login', 'usuario.imagem'))
@@ -12,15 +29,40 @@ class Online_Model extends CI_Model {
 						->get($this->colecao);
 	}
 	
-	public function get_recurso_by_canal($nome)
+	/**
+	 * Registra a mensagem de entrada do usuário no canal
+	 *
+	 * @param array $canal - informações do canal
+	 * @param array $usuario - informações do usuário
+	 * @return void
+	 */
+	public function entrar($canal, $usuario)
+    {
+        $this->load->model(array('Usuario_Model', 'Mensagem_Model'));
+        $this->Mensagem_Model->salvar($canal, $this->Usuario_Model->usuario_canal, '@' . $usuario['login'] . ' entrou no canal');
+    }
+	
+	/**
+	 * Registra a mensagem de saída do usuário no canal
+	 *
+	 * @param array $canal - informações do canal
+	 * @param array $usuario - informações do usuário
+	 * @return void
+	 */
+	public function sair($canal, $usuario)
 	{
-		return $this->mongo_db
-						->select(array('recurso'))
-						->where(array('canal.nome' => $nome))
-						->get($this->colecao);
+		$this->load->model(array('Usuario_Model', 'Mensagem_Model'));
+        $this->Mensagem_Model->salvar($canal, $this->Usuario_Model->usuario_canal, '@' . $usuario['login'] . ' saiu no canal');
 	}
 	
-    public function atualizar($canal, $usuario, $recurso = null)
+	/**
+	 * Atualiza o tempo do usuário no canal
+	 *
+	 * @param array $canal - informações do canal
+	 * @param array $usuario - informações do usuário
+	 * @return mixed
+	 */
+    public function atualizar($canal, $usuario)
     {
     	// Definindo informações
 		$item['canal'] = array('nome' => $canal['nome']);
@@ -32,10 +74,6 @@ class Online_Model extends CI_Model {
 							  );
 							  
 		$item['tempo'] = time();
-		
-		// Se houver recurso (websocket)
-		if (!empty($recurso))
-			$item['recurso'] = $recurso;
 		
 		// Selecionando status
 		$itens = $this->mongo_db
@@ -54,6 +92,9 @@ class Online_Model extends CI_Model {
 			// Se inserido com sucesso
 			if (!empty($id))
 			{
+				// Registrando mensagem de canal
+                $this->entrar($canal, $usuario);
+									
 				// Retornando ID do documento
 				return $id;	
 			}
@@ -71,17 +112,17 @@ class Online_Model extends CI_Model {
 						->update($this->colecao);
     }
 
-	public function get_by_recurso($recurso = null)
-	{
-		$item = $this->mongo_db->where(array('recurso' => $recurso))->get($this->colecao);
-		return (empty($item)) ? null : $item[0];
-	}
-	
-	public function delete_by_id($id = null)
+	/**
+	 * Remove o usuário online do canal pelo ID
+	 *
+	 * @param int $id
+	 * @return bool
+	 */
+	public function remover_por_id($id)
 	{
 		return $this->mongo_db->where(array('_id' => $id))->delete($this->colecao);
 	}
-
+	
 }
 
 /* End of file Online_Model.php */

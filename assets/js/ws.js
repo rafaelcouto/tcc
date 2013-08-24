@@ -33,8 +33,8 @@ $(function($) {
 					// Usuários
 		    		$('#usuario ul').empty();
 		    
-					$.each(dados.usuarios, function() {
-			            $('#usuario ul').append($('<li>' + sprintf(usuario_formato, this.imagem, this.nome, this.login, this.login) + '</li>'));
+					$.each(dados.clientes, function() {
+			       		$('#usuario ul').append($('<li>' + sprintf(usuario_formato, this.usuario.imagem, this.usuario.nome, this.usuario.login, this.usuario.login) + '</li>'));
 			        });
 			        
 			        break;

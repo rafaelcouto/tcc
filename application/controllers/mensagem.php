@@ -7,23 +7,30 @@ class Mensagem extends CI_Controller {
         parent::__construct();
         
         // Carregando model
-        $this->load->model(array('Canal_Model', 'Mensagem_Model', 'Usuario_Model'));      
+        $this->load->model('Mensagem_Model');      
     }
-
+	
+	/**
+	 * Método responsável por salvar mensagem utilizando SP, LP e SSE.
+	 *
+	 * @param string $canal - nome do canal
+	 * @return void
+	 */
 	public function salvar($canal)
 	{
-		if (!$this->login->verificar())
-			exit;
+		if (!$this->login->verificar()) exit;
+		
+		// Carregando model
+        $this->load->model(array('Canal_Model', 'Usuario_Model'));      
 		
 		// Selecionando canal
-		$canal = $this->Canal_Model->get_by_nome($canal);
+		$canal = $this->Canal_Model->buscar_por_nome($canal);
 		
 		// Se não existir
-		if (empty($canal))
-			exit;
+		if (empty($canal)) exit;
 		
 		// Selecionando usuário
-		$usuario = $this->Usuario_Model->get_by_login($this->login->get('login'));
+		$usuario = $this->Usuario_Model->buscar_por_login($this->login->get('login'));
 		
 		// Salvando
 		$this->Mensagem_Model->salvar($canal, $usuario, $this->input->post('mensagem', true));
