@@ -1,2 +1,37 @@
+--------------------------------------------
+-- Serviços (Windows)
+--------------------------------------------
+
+-- Websocket
+php D:\Web\tcc\index.php servidor websocket
+
+-- SP, LP e SSE
+php D:\Web\tcc\index.php servidor generico
+
+-- MongoDB (windows)
 D:\Web\mongodb\mongod.exe --dbpath D:\Web\mongodb\data
-php D:\Web\tcc\index.php servidor listen
+
+--------------------------------------------
+-- Serviços (Linux)
+--------------------------------------------
+
+-- Websocket
+php /var/www/tcc/index.php servidor websocket
+
+-- SP, LP e SSE
+php /var/www/tcc/index.php servidor generico
+
+--------------------------------------------
+-- Dados
+--------------------------------------------
+
+-- Usuários
+db.usuario.insert({"imagem" : "admin.png", "login" : "admin", "nome" : "Administrador", "senha" : "21232f297a57a5a743894a0e4a801fc3"});
+db.usuario.insert({"imagem" : "servico_canal.png", "login" : "servico_canal", "nome" : "Serviço de canal", "senha" : "21232f297a57a5a743894a0e4a801fc3"});
+db.usuario.insert({"imagem" : "sistema.png", "login" : "sistema", "nome" : "Sistema", "senha" : "21232f297a57a5a743894a0e4a801fc3"});
+
+-- Canais
+db.canal.insert({"imagem" : "php.png", "nome" : "php", "topico" : "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged"});
+db.canal.insert({"imagem" : "skype.png", "nome" : "skype", "topico" : "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged"});
+
+
