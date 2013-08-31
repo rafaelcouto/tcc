@@ -79,7 +79,8 @@ class Websocket implements MessageComponentInterface
 		}
 
 		// Enviando mensagem de saída
-		$mensagem = $this->ci->canal_util->mensagem($this->ci->Usuario_Model->usuario_canal, sprintf('@%s saiu no canal', $cliente->usuario['login']));
+		$mensagem = $this->ci->canal_util->mensagem($this->ci->Usuario_Model->usuario_canal, 
+													sprintf('@%s saiu no canal', $cliente->usuario['login']));
 		$this->ci->canal_util->difundir($cliente->canal['nome'], $mensagem);
 		
 		// Atualizando usuários
@@ -166,7 +167,7 @@ class Websocket implements MessageComponentInterface
 		if (empty($this->dados->texto))
 			return 'Nenhuma mensagem definida';
 		
-		if (strlen($this->dados->texto) > 140)
+		if (strlen($this->dados->texto) > 250)
 			return 'A mensagem deve ter no máximo 250 caracteres';
 		
 		// Canal
@@ -241,7 +242,8 @@ class Websocket implements MessageComponentInterface
 		}
 
 		// Enviando
-		$mensagem = $this->ci->canal_util->mensagem($this->ci->Usuario_Model->usuario_canal, sprintf('@%s entrou no canal', $cliente->usuario['login']));
+		$mensagem = $this->ci->canal_util->mensagem($this->ci->Usuario_Model->usuario_canal, 
+													sprintf('@%s entrou no canal', $cliente->usuario['login']));
 		$this->ci->canal_util->difundir($cliente->canal['nome'], $mensagem);
 		
 		// Atualizando usuários
