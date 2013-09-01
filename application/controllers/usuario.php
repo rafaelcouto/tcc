@@ -17,7 +17,15 @@ class Usuario extends CI_Controller {
         }
         else
         {
-            $this->layout->view('usuario/index');
+        	
+			// Carregando modelos
+			$this->load->model('Canal_Model');
+			
+			// Selecionando canais
+			$data['canais'] = $this->Canal_Model->buscar();
+			
+			// View
+            $this->layout->view('usuario/index', $data);
         }
     }
     
@@ -34,10 +42,11 @@ class Usuario extends CI_Controller {
 			$this->session->set_userdata('tecnologia', $this->input->post('tecnologia'));
 			
 			// Sucesso
-        	echo false;
+        	echo $this->util->success();
         }
         else
-            echo 'Usuário ou senha inválido';
+            echo $this->util->error('Login ou senha inválido');
+		
     }
     
 	/**

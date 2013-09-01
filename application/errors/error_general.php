@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<title>Error</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Erro</title>
 <style type="text/css">
 
 ::selection{ background-color: #E13300; color: white; }
@@ -55,7 +56,7 @@ p {
 </head>
 <body>
 	<div id="container">
-		<h1><?php echo $heading; ?></h1>
+		<h1>Oops, ocorreu um erro</h1>
 		<?php echo $message; ?>
 	</div>
 </body>
