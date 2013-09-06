@@ -15,6 +15,16 @@ class Canal_Model extends CI_Model {
         $item = $this->mongo_db->where(array('nome' => $nome))->get($this->colecao);
 		return (empty($item)) ? null : $item[0];
     }
+	
+	/**
+	 * Busca todos os canais registrados
+	 *
+	 * @return array
+	 */
+	public function buscar()
+	{
+		return $this->mongo_db->get($this->colecao);
+	}
 
 }
 

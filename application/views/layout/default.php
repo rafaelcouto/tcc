@@ -6,8 +6,12 @@
         
         <title>TCC</title>
         
+        <?php echo link_tag('bootstrap.css') ?>	
         <?php echo link_tag('global.css') ?>
+        
+        <?php echo script_tag('lib/bootstrap.js'); ?>
         <?php echo script_tag('lib/jquery.js'); ?>
+        <?php echo script_tag('global.js'); ?>
         
         <script type="text/javascript">
             var base_url = '<?php echo base_url() ?>';
