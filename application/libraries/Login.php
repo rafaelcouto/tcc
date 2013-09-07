@@ -9,15 +9,9 @@ class Login
         $this->obj->load->library('session'); // Carrerando biblioteca de sessões
     }
     
-    function getUser()
+    function usuario()
     {
         return $this->obj->session->userdata('usuario');
-    }
-    
-    function get($key)
-    {
-         $user = $this->obj->session->userdata('usuario');
-         return (string) $user[$key];
     }
 	
     function logar($login, $senha, $redireciona = null) {
