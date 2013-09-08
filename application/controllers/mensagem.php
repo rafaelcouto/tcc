@@ -29,11 +29,8 @@ class Mensagem extends CI_Controller {
 		// Se não existir
 		if (empty($canal)) exit;
 		
-		// Selecionando usuário
-		$usuario = $this->Usuario_Model->buscar_por_login($this->login->get('login'));
-		
 		// Salvando
-		$this->Mensagem_Model->salvar($canal, $usuario, $this->input->post('mensagem', true));
+		$this->Mensagem_Model->salvar($canal, $this->login->usuario(), $this->input->post('mensagem', true));
 		
 	}
 	

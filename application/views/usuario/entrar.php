@@ -75,41 +75,6 @@ $(function($) {
     
 </script>
 
-<!--
-<form id="frmLogin" action="<?php echo site_url('usuario/entrar/') ?>" method="post">
-
-    <fieldset>
-        <legend>Entrar</legend>
-
-        <div class="loader" style="display: none;"><?php echo img('icone/loader.gif', 'Carregando') ?></div>
-        
-        <div class="mensagem-erro"></div>
-
-        <p>
-            <label for="login">Usuário</label> <br />
-            <input type="text" id="usuario" name="usuario" size="50" />
-        </p>
-
-        <p>
-            <label for="password">Senha</label> <br />
-            <input type="password" id="senha" name="senha" size="50" />
-        </p>
-		
-		
-		<p>
-			<input type="radio" name="tecnologia" value="sp" checked>Short polling</input>
-			<input type="radio" name="tecnologia" value="lp">Long polling</input>
-			<input type="radio" name="tecnologia" value="sse">SSE</input>
-			<input type="radio" name="tecnologia" value="ws">Websocket</input>
-		</p>
-
-        <input type="submit" value="Entrar" />
-        
-    </fieldset>
-    
-</form>
--->
-
 <form class="form-horizontal" method="post" action="<?php echo site_url('usuario/entrar/') ?>">
     
   <legend>Entrar</legend>
@@ -134,15 +99,17 @@ $(function($) {
   </div>
   
   <div class="control-group">
-    <label class="control-label" for="senha">Tecnologia</label>
+    <label class="control-label" for="tecnologia">Tecnologia</label>
     <div class="controls">
-      	<input type="radio" name="tecnologia" value="sp" checked>Short polling</input>
-		<input type="radio" name="tecnologia" value="lp">Long polling</input>
-		<input type="radio" name="tecnologia" value="sse">SSE</input>
-		<input type="radio" name="tecnologia" value="ws">Websocket</input>
-    </div>
+	    <select name="tecnologia">
+		  <option value="sp">Short polling</option>
+		  <option value="lp">Long polling</option>
+		  <option value="sse">SSE</option>
+		  <option value="ws">Websocket</option>
+		</select>
+	</div>
   </div>
-  
+
   <div class="control-group">
     <div class="controls">
       <button type="submit" class="btn"><i class="icon-ok-sign"></i> Entrar</button>
