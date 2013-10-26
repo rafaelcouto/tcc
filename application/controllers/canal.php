@@ -77,7 +77,7 @@ class Canal extends CI_Controller {
             
         // Tempo de execução
         $data['latencia'] = $this->timer->get(Timer::MILLISECONDS);
-		$data['memoria'] = round((memory_get_usage() / 1024) / 1024, 2);
+		$data['memoria'] = $this->util->bytes_to_mb(memory_get_usage());
 		
 		// Retornando dados
 		echo json_encode($data);
@@ -139,7 +139,7 @@ class Canal extends CI_Controller {
 
 				// Tempo de execução e memória
         		$data['latencia'] = $this->timer->get(Timer::MILLISECONDS);
-				$data['memoria'] = round((memory_get_usage() / 1024) / 1024, 2);
+				$data['memoria'] = $this->util->bytes_to_mb(memory_get_usage());
 				
 				// Retornando dados
 				echo json_encode($data);
@@ -186,7 +186,8 @@ class Canal extends CI_Controller {
 		$this->load->model(array('Online_Model', 'Mensagem_Model'));
 		$this->load->library('timer');
 
-		$ultima_mensagem_id = null;
+		$usuario_online_atual = array();
+		$ultima_mensagem = null;
 		$i = 0;
 		$c = 0;
 
@@ -194,6 +195,7 @@ class Canal extends CI_Controller {
 		{
 			// Iniciando vetores
 			$data = array();
+			$usuario_online = array();
 			
 			// Iniciando timer
 			$this->timer->reset();
@@ -204,32 +206,50 @@ class Canal extends CI_Controller {
 			
 			// Buscando mensagens e usuários
 			$data['usuario'] = $this->Online_Model->buscar_por_canal($canal['nome']);
-			$data['mensagem'] = $this->Mensagem_Model->buscar_por_canal($canal['nome'], $ultima_mensagem_id->{'$id'});
+			$data['mensagem'] = $this->Mensagem_Model->buscar_por_canal($canal['nome'], $ultima_mensagem->{'$id'});
 			$c = count($data['mensagem']);
 			
-			if ($c > 0)
-				$ultima_mensagem_id = $data['mensagem'][$c - 1]['_id'];
+			// Alocando usuários online para comparação
+			foreach ($data['usuario'] as $usuario)
+				$usuario_online[] = $usuario['usuario']['login'];
 			
-			// Finalizando timer
-    		$this->timer->stop();
+			// Se houver mensagens ou alguma modificação nos usuários
+			if ((!empty($data['mensagem'])) or (sizeof(array_diff($usuario_online, $usuario_online_atual)) > 0))
+			{
+				// Alocando última mensagem
+				if ($c > 0)
+					$ultima_mensagem = $data['mensagem'][$c - 1]['_id'];
+				
+				// Definindo usuários
+				$usuario_online_atual = $usuario_online;
+				
+				// Finalizando timer
+	    		$this->timer->stop();
+				
+				// Tempo de execução e memória
+				$data['latencia'] = $this->timer->get(Timer::MILLISECONDS);
+				$data['memoria'] = $this->util->bytes_to_mb(memory_get_usage());
+				
+				// Resposta
+	            echo "id: {$i}" . PHP_EOL; 
+				echo 'data: ' . json_encode($data) . PHP_EOL;
+	
+				$i++;
+				
+				// Finalizando dados
+	            echo PHP_EOL;
+	
+	            // Enviando saída
+	            ob_flush();
+				flush();
 			
-			// Tempo de execução e memória
-			$data['latencia'] = $this->timer->get(Timer::MILLISECONDS);
-			$data['memoria'] = round((memory_get_usage() / 1024) / 1024, 2);
-			
-			// Resposta
-            echo "id: {$i}" . PHP_EOL; 
-			echo 'data: ' . json_encode($data) . PHP_EOL;
+			}
+			else 
+			{
+				// Finalizando timer
+	    		$this->timer->stop();
+			}
 
-			$i++;
-			
-			// Finalizando dados
-            echo PHP_EOL;
-
-            // Enviando saída
-            ob_flush();
-			flush();
-            
             // Aguardando próximo loop
             sleep(3);
 			

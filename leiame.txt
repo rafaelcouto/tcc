@@ -31,6 +31,8 @@ db.usuario.insert({"imagem" : "servico_canal.png", "login" : "servico_canal", "n
 db.usuario.insert({"imagem" : "sistema.png", "login" : "sistema", "nome" : "Sistema", "senha" : "21232f297a57a5a743894a0e4a801fc3"});
 db.usuario.insert({"imagem" : "chrome.png", "login" : "chrome", "nome" : "Google Chrome", "senha" : "21232f297a57a5a743894a0e4a801fc3"});
 db.usuario.insert({"imagem" : "firefox.png", "login" : "firefox", "nome" : "Firefox", "senha" : "21232f297a57a5a743894a0e4a801fc3"});
+db.usuario.insert({"imagem" : "safari.png", "login" : "safari", "nome" : "Safari", "senha" : "21232f297a57a5a743894a0e4a801fc3"});
+db.usuario.insert({"imagem" : "opera.png", "login" : "opera", "nome" : "Opera", "senha" : "21232f297a57a5a743894a0e4a801fc3"});
 
 -- Canais
 db.canal.insert({"imagem" : "php.png", "nome" : "php", "topico" : "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged"});

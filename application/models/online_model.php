@@ -65,14 +65,8 @@ class Online_Model extends CI_Model {
     public function atualizar($canal, $usuario)
     {
     	// Definindo informações
-		$item['canal'] = array('nome' => $canal['nome']);
-		
-		$item['usuario'] = array(
-								'login' => $usuario['login'],
-								'nome' => $usuario['nome'],
-								'imagem' => $usuario['imagem']
-							  );
-							  
+		$item['canal'] = $canal;
+		$item['usuario'] = $usuario;		  
 		$item['tempo'] = time();
 		
 		// Selecionando status

@@ -15,7 +15,7 @@ class Servidor extends CI_Controller {
 	 *
 	 * @return void
 	 */
-	public function websocket($porta = 9000)
+	public function websocket($porta = 8000)
 	{
 		// Carregando classe do aplicativo
 		$this->load->library('Websocket');
