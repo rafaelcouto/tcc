@@ -1,19 +1,20 @@
-Trabalho de Conclusão de Curso - Anhanguera 2013
+# Trabalho de Conclusão de Curso
 
-Autores:
-Rafael Couto Alves
+* Faculdade Anhanguera de Bauru;
+* Ciência da computação 2013.
+* **Autores:** 
+	* Rafael Couto Alves; 
+	* Alex Sandro Zani Bergamin.
 
-Alex Sandro Zani Bergamin
+**Instruções**
 
+* Executar os comandos contidos no arquivo **mongodb.txt** no banco de dados MongoDB;
+* Iniciar os servidores de canais, executando os seguintes comandos em diferentes terminais:
 
-Instruções
+```
+// Websocket 
+php index.php servidor websocket
 
-1) Executar os comandos contidos no arquivo 'mongodb.txt' no banco de dados MongoDB.
-
-2) Iniciar os servidores de canais, para isso basta rodar os seguintes comandos em diferentes terminais:
-
-	-- Websocket 
-	php index.php servidor websocket
-	
-	-- SP, LP e SSE
-	php index.php servidor generico
+// SP, LP e SSE
+php index.php servidor generico
+```
