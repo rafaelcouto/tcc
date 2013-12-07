@@ -8,6 +8,9 @@
 
 **Instruções**
 
+* Editar o arquivo **.htaccess** com o caminho do aplicativo;
+* Editar o arquivo **application/config/config.php** com a URL do aplicativo;
+* Editar o arquivo **application/config/mongodb.php** com as configurações de conexão do banco de dados;
 * Executar os comandos contidos no arquivo **mongodb.txt** no banco de dados MongoDB;
 * Iniciar os servidores de canais, executando os seguintes comandos em diferentes terminais:
 
