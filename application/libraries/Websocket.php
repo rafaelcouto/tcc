@@ -103,7 +103,7 @@ class Websocket implements MessageComponentInterface
 		$cliente = $this->ci->canal_util->buscar_cliente_por_recurso($recurso);
 
         // Fechando conexão
-        $conn->close();
+        $cliente->close();
 		
 		// Log
 		echo sprintf('@%s foi desconectado do canal #%s com erro: ' . $e->getMessage(), $cliente->usuario['login'], $cliente->canal['nome']) . PHP_EOL;

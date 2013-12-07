@@ -2,7 +2,7 @@ var ws = null;
 
 $(function($) {
 	
-	ws = new WebSocket('ws://localhost:8000');
+	ws = new WebSocket(ws_url);
 
 	ws.onopen = function(e) {
 	    

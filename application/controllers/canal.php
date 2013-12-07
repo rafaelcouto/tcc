@@ -22,7 +22,7 @@ class Canal extends CI_Controller {
 		
 		// Definindo tecnologia utilizada
 		$data['tecnologia'] = $this->session->userdata('tecnologia');
-		
+
 		// Selecionando canal
 		$data['canal'] = $this->Canal_Model->buscar_por_nome($canal);
 		$data['usuario'] = $this->login->usuario();
@@ -33,7 +33,7 @@ class Canal extends CI_Controller {
 		
 		// Assets
 		$this->css = array('canal.css');
-		$this->js = array('canal.js', "{$data["tecnologia"]}.js", 'lib/sprintf.js', 'lib/jquery.dateFormat.js');
+		$this->js = array('canal.js', "{$data['tecnologia']}.js", 'lib/sprintf.js', 'lib/jquery.dateFormat.js');
 		
 		// View
 		$this->layout->view("canal/index", $data);

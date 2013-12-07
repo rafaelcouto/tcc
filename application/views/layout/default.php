@@ -15,7 +15,7 @@
         
         <script type="text/javascript">
             var base_url = '<?php echo base_url() ?>';
-            var assets_url = '<?php echo $this->config->item('assets_url') ?>';
+            var ws_url = '<?php echo $this->config->item('ws_url') ?>';
         </script>
         
         <?php if (isset($this->css)) foreach ($this->css as $css)
