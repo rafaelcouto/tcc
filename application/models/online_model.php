@@ -30,52 +30,37 @@ class Online_Model extends CI_Model {
 	}
 	
 	/**
-	 * Registra a mensagem de entrada do usuário no canal
+	 * Busca o status de um usuário no canal
 	 *
-	 * @param array $canal - informações do canal
-	 * @param array $usuario - informações do usuário
-	 * @return void
+	 * @param string $canal
+	 * @param string $usuario
+	 * @return array
 	 */
-	public function entrar($canal, $usuario)
-    {
-        $this->load->model(array('Usuario_Model', 'Mensagem_Model'));
-        $this->Mensagem_Model->salvar($canal, $this->Usuario_Model->usuario_canal, '@' . $usuario['login'] . ' entrou no canal');
-    }
-	
-	/**
-	 * Registra a mensagem de saída do usuário no canal
-	 *
-	 * @param array $canal - informações do canal
-	 * @param array $usuario - informações do usuário
-	 * @return void
-	 */
-	public function sair($canal, $usuario)
+	public function buscar_por_canal_e_usuario($canal, $usuario)
 	{
-		$this->load->model(array('Usuario_Model', 'Mensagem_Model'));
-        $this->Mensagem_Model->salvar($canal, $this->Usuario_Model->usuario_canal, '@' . $usuario['login'] . ' saiu no canal');
+		return $itens = $this->mongo_db
+						  	 ->where(array(
+						  		'canal.nome' => $canal,
+						  		'usuario.login' => $usuario
+							 ))
+						  	 ->get($this->colecao);
 	}
 	
 	/**
-	 * Atualiza o tempo do usuário no canal
+	 * Registra a entrada do usuário no canal
 	 *
 	 * @param array $canal - informações do canal
 	 * @param array $usuario - informações do usuário
-	 * @return mixed
+	 * @return string
 	 */
-    public function atualizar($canal, $usuario)
+	public function entrar($canal, $usuario)
     {
     	// Definindo informações
 		$item['canal'] = $canal;
 		$item['usuario'] = $usuario;		  
 		$item['tempo'] = time();
 		
-		// Selecionando status
-		$itens = $this->mongo_db
-					  	->where(array(
-					  		'canal.nome' => $canal['nome'],
-					  		'usuario.login' => $usuario['login']
-						))
-					  	->get($this->colecao);
+		$itens = $this->buscar_por_canal_e_usuario($canal['nome'], $usuario['login']);
 		
 		// Se não existir
 		if (empty($itens))
@@ -86,24 +71,77 @@ class Online_Model extends CI_Model {
 			// Se inserido com sucesso
 			if (!empty($id))
 			{
-				// Registrando mensagem de canal
-                $this->entrar($canal, $usuario);
+				$this->load->model(array('Usuario_Model', 'Mensagem_Model'));
+        		$this->Mensagem_Model->salvar($canal, $this->Usuario_Model->usuario_canal, '@' . $usuario['login'] . ' entrou no canal');
 									
 				// Retornando ID do documento
-				return $id;	
-			}
-			else 
-			{
-				return null;
+				return $id;
 			}
 
 		}
-		else
-			// Atualizando
-			return $this->mongo_db
-					  	->where(array('_id' => $itens[0]['_id']))
-						->set($item)
-						->update($this->colecao);
+			
+		return null;
+    }
+	
+	/**
+	 * Registra a saída do usuário no canal
+	 *
+	 * @param array $canal - informações do canal
+	 * @param array $usuario - informações do usuário
+	 * @return void
+	 */
+	public function sair($canal, $usuario)
+	{
+		// Definindo informações
+		$item['canal'] = $canal;
+		$item['usuario'] = $usuario;		  
+		$item['tempo'] = time();
+		
+		$itens = $this->buscar_por_canal_e_usuario($canal['nome'], $usuario['login']);
+		
+		// Se não existir
+		if (!empty($itens))
+		{
+			$id = $this->mongo_db
+					   ->where(array('_id' => $itens[0]['_id']))
+					   ->delete($this->colecao);
+						
+			if (!empty($id))
+			{
+				$this->load->model(array('Usuario_Model', 'Mensagem_Model'));
+        		$this->Mensagem_Model->salvar($canal, $this->Usuario_Model->usuario_canal, '@' . $usuario['login'] . ' saiu no canal');
+			}
+		}
+	}
+
+	/**
+	 * Atualiza o status do usuário no canal
+	 *
+	 * @param array $canal - informações do canal
+	 * @param array $usuario - informações do usuário
+	 * @return string
+	 */
+    public function atualizar($canal, $usuario)
+    {
+    	// Definindo informações
+		$item['canal'] = $canal;
+		$item['usuario'] = $usuario;		  
+		$item['tempo'] = time();
+		
+		$itens = $this->buscar_por_canal_e_usuario($canal['nome'], $usuario['login']);
+		
+		// Se não existir
+		if (!empty($itens))
+		{
+			$this->mongo_db
+			  	 ->where(array('_id' => $itens[0]['_id']))
+				 ->set($item)
+				 ->update($this->colecao);
+				 
+			return $itens[0]['_id'];
+		}
+		
+		return null;
     }
 
 	/**

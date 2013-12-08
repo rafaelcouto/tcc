@@ -58,6 +58,16 @@ class Usuario extends CI_Controller {
     {
         $this->login->logout('usuario');
     }
+	
+	/**
+	 * Perfil do usuário no aplicativo
+	 *
+	 * @return void
+	 */
+	 public function perfil($usuario)
+	 {
+	 	show_error('Perfil de usuário não implementado no aplicativo');
+	 }
 
 }
 

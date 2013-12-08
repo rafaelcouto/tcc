@@ -41,6 +41,54 @@ class Canal extends CI_Controller {
     }
 	
 	/**
+	 * Registra a entrada do usuário no canal
+	 *
+	 * @param string $canal - nome do canal
+	 * @return void
+	 */
+	public function entrar($canal)
+	{
+		if (!$this->login->verificar()) exit;
+		
+		// Selecionando canal
+		$canal = $this->Canal_Model->buscar_por_nome($canal);
+		
+		// Se não existir
+		if (empty($canal))
+			exit;
+		
+		// Carregando
+		$this->load->model('Online_Model');
+		
+		// Entrando
+		$this->Online_Model->entrar($canal, $this->login->usuario());
+	}
+	
+	/**
+	 * Registra a saída do usuário no canal
+	 *
+	 * @param string $canal - nome do canal
+	 * @return void
+	 */
+	public function sair($canal)
+	{
+		if (!$this->login->verificar()) exit;
+		
+		// Selecionando canal
+		$canal = $this->Canal_Model->buscar_por_nome($canal);
+		
+		// Se não existir
+		if (empty($canal))
+			exit;
+		
+		// Carregando
+		$this->load->model('Online_Model');
+		
+		// Entrando
+		$this->Online_Model->sair($canal, $this->login->usuario());
+	}
+	
+	/**
 	 * Atualiza o canal através de 'Short Polling (SP)' 
 	 *
 	 * @param string $canal - nome do canal
@@ -49,12 +97,7 @@ class Canal extends CI_Controller {
 	public function sp_atualizar($canal)
 	{
 		if (!$this->login->verificar()) exit;
-		
-		// Iniciando timer
-		$this->load->library('timer');
-		$this->timer->reset();
-		$this->timer->start();	
-		
+
 		// Selecionando canal
 		$canal = $this->Canal_Model->buscar_por_nome($canal);
 		
@@ -71,13 +114,6 @@ class Canal extends CI_Controller {
 		$data = array();
 		$data['mensagem'] = $this->Mensagem_Model->buscar_por_canal($canal['nome'], $this->input->post('maior_que'));
 		$data['usuario'] = $this->Online_Model->buscar_por_canal($canal['nome']);
-
-		// Finalizando timer
-        $this->timer->stop();
-            
-        // Tempo de execução
-        $data['latencia'] = $this->timer->get(Timer::MILLISECONDS);
-		$data['memoria'] = $this->util->bytes_to_mb(memory_get_usage());
 		
 		// Retornando dados
 		echo json_encode($data);
@@ -105,23 +141,21 @@ class Canal extends CI_Controller {
 		
 		// Carregando
 		$this->load->model(array('Online_Model', 'Mensagem_Model'));
-		$this->load->library('timer');
 		
 		// Usuários online para comparação
 		$usuario_online_atual = explode(',', $this->input->post('usuario_online'));
-
-		while (true)
+		
+		// Status do usuário no canal
+		$status = null;
+		
+		do
 		{
 			// Iniciando vetores
 			$data = array();
 			$usuario_online = array();
 			
-			// Iniciando timer
-			$this->timer->reset();
-			$this->timer->start();
-
 			// Atualizando status
-			$this->Online_Model->atualizar($canal, $this->login->usuario());
+			$status = $this->Online_Model->atualizar($canal, $this->login->usuario());
 			
 			// Buscando mensagens e usuários
 			$data['mensagem'] = $this->Mensagem_Model->buscar_por_canal($canal['nome'], $this->input->post('maior_que'));
@@ -134,30 +168,21 @@ class Canal extends CI_Controller {
 			// Se houver mensagens ou alguma modificação nos usuários
 			if ((!empty($data['mensagem'])) or (sizeof(array_diff($usuario_online, $usuario_online_atual)) > 0))
 			{
-				// Finalizando timer
-        		$this->timer->stop();
-
-				// Tempo de execução e memória
-        		$data['latencia'] = $this->timer->get(Timer::MILLISECONDS);
-				$data['memoria'] = $this->util->bytes_to_mb(memory_get_usage());
-				
 				// Retornando dados
 				echo json_encode($data);
 				break;
 			}
 			else 
 			{
-				// Finalizando timer
-        		$this->timer->stop();
-				
 				// Aguardando próxima busca
 				sleep(3);
 				continue;
 			}
 
-		}
+		} while(!is_null($status));
 
 	}
+	
 	
 	/**
 	 * Atualiza o canal através de 'Server-sent Event (SSE)'
@@ -175,7 +200,7 @@ class Canal extends CI_Controller {
 			
 		// Desativando tempo limite do script
 		set_time_limit(0);
-		
+
 		// Selecionando canal
 		$canal = $this->Canal_Model->buscar_por_nome($canal);
 		
@@ -184,12 +209,14 @@ class Canal extends CI_Controller {
 		
 		// Carregando
 		$this->load->model(array('Online_Model', 'Mensagem_Model'));
-		$this->load->library('timer');
 
 		$usuario_online_atual = array();
 		$ultima_mensagem = null;
 		$i = 0;
 		$c = 0;
+		
+		// Status do usuário no canal
+		$status = null;
 
 		do
 		{
@@ -197,12 +224,8 @@ class Canal extends CI_Controller {
 			$data = array();
 			$usuario_online = array();
 			
-			// Iniciando timer
-			$this->timer->reset();
-			$this->timer->start();
-
 			// Atualizando status
-			$this->Online_Model->atualizar($canal, $this->login->usuario());
+			$status = $this->Online_Model->atualizar($canal, $this->login->usuario());
 			
 			// Buscando mensagens e usuários
 			$data['usuario'] = $this->Online_Model->buscar_por_canal($canal['nome']);
@@ -223,13 +246,6 @@ class Canal extends CI_Controller {
 				// Definindo usuários
 				$usuario_online_atual = $usuario_online;
 				
-				// Finalizando timer
-	    		$this->timer->stop();
-				
-				// Tempo de execução e memória
-				$data['latencia'] = $this->timer->get(Timer::MILLISECONDS);
-				$data['memoria'] = $this->util->bytes_to_mb(memory_get_usage());
-				
 				// Resposta
 	            echo "id: {$i}" . PHP_EOL; 
 				echo 'data: ' . json_encode($data) . PHP_EOL;
@@ -244,16 +260,11 @@ class Canal extends CI_Controller {
 				flush();
 			
 			}
-			else 
-			{
-				// Finalizando timer
-	    		$this->timer->stop();
-			}
-
+	
             // Aguardando próximo loop
             sleep(3);
 			
-		} while (true);
+		} while (!is_null($status));
 
 	}
 	

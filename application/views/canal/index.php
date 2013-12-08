@@ -17,9 +17,6 @@
         
     </div>
     
-    <div id="latencia"></div>
- 	<div id="memoria"></div>
-     
     <input type="text" id="nova_mensagem" style="width: 98%" placeholder="Digite uma mensagem aqui" />
 
 	<div id="mensagem">

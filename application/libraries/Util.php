@@ -3,34 +3,42 @@
 class Util
 {
     
-    var $obj;
-    
-    function Util() {
-        $this->obj =& get_instance(); // Criando instancia do CI
-    }
-    
+	/**
+	 * Constroi mensagem de erro
+	 *
+	 * @param string $text
+	 * @return JSON
+	 */
     public function error($text = null)
     {
         return $this->response(0, $text);
     }
     
+	/**
+	 * Constroi mensagem de sucesso
+	 *
+	 * @param string $text
+	 * @return JSON
+	 */
     public function success($text = null)
     {
         return $this->response(1, $text);
     }
     
-    public function response($status, $text)
+	/**
+	 * Constroi padrão de mensagem
+	 *
+	 * @param int $status
+	 * @param string $text
+	 * @return JSON
+	 */
+    private function response($status, $text)
     {
         return json_encode(array(
                                 'status' => $status, 
                                 'text' => $text
                                 ));
     }
-    
-	public function bytes_to_mb($bytes)
-	{
-		return round(($bytes / 1024) / 1024, 2);
-	}
 	
 }
 

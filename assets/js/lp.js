@@ -1,8 +1,11 @@
 // Quando carregada a página
 $(function($) {
 	
-	// Atualização inicial
-	atualizar();
+	// Entrando
+    $.post(base_url + 'canal/entrar/' + canal_nome, function(data) {
+		// Iniciando processo de atualização
+		atualizar();
+	});
 	
 });
 
@@ -36,11 +39,7 @@ function atualizar()
         $.each(data.usuario, function() {
         	$('#usuario ul').append($('<li id="' + this._id.$id + '">' + sprintf(usuario_formato, this.usuario.imagem, this.usuario.nome, this.usuario.login, this.usuario.login) + '</li>'));
         });
-		
-		// Latência e memória
-        $('#latencia').html(data.latencia + 'ms');
-        $('#memoria').html(data.memoria + 'mb');
-        
+
         // Continua atualização
         atualizar();
         

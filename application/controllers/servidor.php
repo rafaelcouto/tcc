@@ -16,7 +16,7 @@ class Servidor extends CI_Controller {
 	 *
 	 * @return void
 	 */
-	public function websocket($porta = 8000)
+	public function websocket()
 	{
 		// Carregando classe do aplicativo
 		$this->load->library('Websocket');
@@ -28,7 +28,7 @@ class Servidor extends CI_Controller {
 	                new Websocket()
 	            )
 	        ),
-	        $porta
+	        $this->config->item('ws_port')
 	    );
 		
 		// Instanciando
@@ -38,7 +38,7 @@ class Servidor extends CI_Controller {
 	/**
 	 * Instancia um servidor de SP, LP e SSE, objetivos:
 	 * - Limpar as mensagens expiradas
-	 * - Removenddo os usuários offline
+	 * - Removendo os usuários offline
 	 *
 	 * @return void
 	 */
@@ -50,20 +50,18 @@ class Servidor extends CI_Controller {
 		// Carregando modelos
 		$this->load->model(array('Mensagem_Model', 'Online_Model'));
 		
+		// Tempo máximo de resposta do usuário (em segundos)
+		$timeout = 15;
+		
 		do 
 		{
 			// Removendo
 			// Usuários
-			$onlines = $this->Online_Model->buscar_por_tempo(time() - 4);
+			$onlines = $this->Online_Model->buscar_por_tempo(time() - $timeout);
 			
 			foreach ($onlines as $online)
-			{
-				// Enviando mensagem
+				// Saindo
 				$this->Online_Model->sair($online['canal'], $online['usuario']);
-				
-				// Removendo
-				$this->Online_Model->remover_por_id($online['_id']);
-			}
 
 	        // Mensagens
 	        $this->Mensagem_Model->remover_por_tempo(time() - (1 * 60 * 60));

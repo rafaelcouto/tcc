@@ -21,6 +21,15 @@ $(function($) {
 	        }
 	        
 	    });
+	    
+	    // Quando sair da página
+		window.onbeforeunload = function() {
+			$.ajax({
+			    type: 'POST',
+			    async: false, 
+			    url: base_url + 'canal/sair/' + canal_nome
+			});
+		};
 	}
 	
 });
